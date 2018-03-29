@@ -3,6 +3,7 @@ export class Player {
   name: string;
 }
 export class Team {
+  name: string;
   player1: string;
   player2: string;
 }

@@ -1,6 +1,13 @@
-<p>Matches</p>
-<div *ngFor="let levelMatches of allMatches()">
-  <div *ngFor="let match of levelMatches">
-    <app-match [match]="match"></app-match>
+<div class="row">
+  <div *ngFor="let levelMatches of allMatches();let level = index" class="col">
+    <p>Level {{level + 1}}</p>
+    <div class="row">
+      <ng-container *ngFor="let match of levelMatches" class="col">
+        <div class="col">
+          <app-match [match]="match"></app-match>
+        </div>
+        <div class="w-100"></div>
+      </ng-container>
+    </div>
   </div>
 </div>

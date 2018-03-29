@@ -1,6 +1,14 @@
-<div>
-  {{match.team1.player1}} - {{match.team1.player2}}
-</div>
-<div>
-  {{match.team2.player1}} - {{match.team2.player2}}
+<div class="card">
+  <div class="card-body">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+      {{match.team1.name}} :
+      {{match.team1.player1}} - {{match.team1.player2}}
+      </li>
+      <li class="list-group-item">
+      {{match.team2.name}} :
+      {{match.team2.player1}} - {{match.team2.player2}}
+      </li>
+    </ul>
+  </div>
 </div>

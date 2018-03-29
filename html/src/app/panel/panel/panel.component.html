@@ -1,13 +1,12 @@
-<p>
-  panel works!
-</p>
 <div class="container-fluid">
   <div class="row">
     <div class="col-sm">
+      <h2>Panel</h2>
       <app-matches [matches]="tournament.matches"></app-matches>
     </div>
     <div class="col-sm">
       <div class="players-container">
+        <h2>Players</h2>
         <div *ngFor="let player of tournament.players">
           <app-player [player]="player"></app-player>
         </div>
