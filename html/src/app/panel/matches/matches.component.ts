@@ -15,17 +15,14 @@ export class MatchesComponent implements OnInit {
   ngOnInit() {
   }
 
-  firstLevel() {
-    return this.matches;
+  allMatches() {
+    let res : Array<Array<Match>> = [];
+    for(var i = 0; i < numberOfLevels(this.matches); i++) {
+        res[i] = matchesOfLevel(this.matches, i);
+    }
+    return res;
   }
 
-  matchesOfLevel(level: number) {
-    return matchesOfLevel(this.matches, level)
-  }
-
-  numberOfLevels() {
-    return numberOfLevels(this.matches, 0)
-  }
 
 
 }

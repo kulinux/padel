@@ -1,4 +1,6 @@
 <p>Matches</p>
-<div *ngFor="let match of firstLevel()">
-  <app-match [match]="match"></app-match>
+<div *ngFor="let levelMatches of allMatches()">
+  <div *ngFor="let match of levelMatches">
+    <app-match [match]="match"></app-match>
+  </div>
 </div>
