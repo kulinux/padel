@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import {Match} from "../../model/model"
+import {Match, Team} from "../../model/model"
 
 @Component({
   selector: 'app-match',
@@ -13,6 +13,15 @@ export class MatchComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+  }
+
+  onMouseOver(team: Team) {
+    console.log("mouse over!!" + team.name)
+    this.match.nextMatch.team1 = team;
+  }
+
+  onMouseLeave(team: Team) {
+    console.log("mouse leave!!")
   }
 
 }

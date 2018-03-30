@@ -1,7 +1,11 @@
-<div class="row">
-  <div *ngFor="let levelMatches of allMatches();let level = index" class="col">
-    <p>Level {{level + 1}}</p>
+<div class="row" >
+  <div *ngFor="let levelMatches of allMatches;let level = index" class="col">
+    <p>Level {{level + 1}} / {{allMatches.length}}</p>
+
     <div class="row">
+      <!--Has de colocar level * 2 -->
+      <!-- Si tiene level, no coloco nada -->
+      <!-- Si tiene level / 2, un hueco -->
       <ng-container *ngFor="let match of levelMatches" class="col">
         <div class="col">
           <app-match [match]="match"></app-match>

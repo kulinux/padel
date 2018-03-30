@@ -22,10 +22,15 @@ export class PanelComponent implements OnInit {
         {
           team1: { name: 'team1', player1 : 'hs', player2: 'lo' },
           team2: { name: 'team3', player1 : 'hs', player2: 'lo' },
-          nextMatch: {
+          nextMatch:
+          {
             team1: { name: 'team1', player1 : 'hs', player2: 'lo' },
             team2: { name: 'team5', player1 : 'hs', player2: 'lo' },
-            nextMatch: null
+            nextMatch: {
+              team1: { name: 'team1', player1 : 'hs', player2: 'lo' },
+              team2: null,
+              nextMatch: null
+            }
           }
         }
       },
