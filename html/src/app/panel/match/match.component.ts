@@ -9,19 +9,31 @@ import {Match, Team} from "../../model/model"
 export class MatchComponent implements OnInit {
 
   @Input() match : Match;
+  finish: boolean = false;
 
   constructor() { }
 
   ngOnInit() {
   }
 
+  onMouseClick(team: Team) {
+    this.finish = true;
+    if(this.match.nextMatch) {
+      this.match.nextMatch.team1 = team;
+    }
+  }
+
   onMouseOver(team: Team) {
-    console.log("mouse over!!" + team.name)
-    this.match.nextMatch.team1 = team;
+    if(this.finish) return;
+    if(this.match.nextMatch) {
+      this.match.nextMatch.team1 = team;
+    }
   }
 
   onMouseLeave(team: Team) {
-    console.log("mouse leave!!")
+    if(this.finish) return;
+    this.match.nextMatch.team1 = null;
+    this.match.nextMatch.team2 = null;
   }
 
 }

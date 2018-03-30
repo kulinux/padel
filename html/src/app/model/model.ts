@@ -13,8 +13,8 @@ export class Match {
   nextMatch: Match;
 }
 export class Tournament {
-    players: Array<Player>;
-    matches: Array<Match>;
+    players: Array<Player> = [];
+    matches: Array<Match> = [];
 }
 
 export function matchesOfLevel(
