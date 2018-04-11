@@ -8,7 +8,7 @@
       <!-- Si tiene level / 2, un hueco -->
       <ng-container *ngFor="let match of levelMatches" class="col">
         <div class="col">
-          <app-match [match]="match"></app-match>
+          <app-match [match]="match" (finished)="matchFinished($event)"></app-match>
         </div>
         <div class="w-100"></div>
       </ng-container>

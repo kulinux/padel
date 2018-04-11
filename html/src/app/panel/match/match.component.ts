@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import {Match, Team} from "../../model/model"
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import {Match, Team, MatchResult} from "../../model/model"
 
 @Component({
   selector: 'app-match',
@@ -9,6 +9,9 @@ import {Match, Team} from "../../model/model"
 export class MatchComponent implements OnInit {
 
   @Input() match : Match;
+
+  @Output() finished = new EventEmitter<MatchResult>();
+
   finish: boolean = false;
 
   constructor() { }
@@ -18,22 +21,32 @@ export class MatchComponent implements OnInit {
 
   onMouseClick(team: Team) {
     this.finish = true;
+
+    let result = new MatchResult(this.match, team);
+
+    this.finished.emit(result);
+    /*
     if(this.match.nextMatch) {
       this.match.nextMatch.team1 = team;
     }
+    */
   }
 
   onMouseOver(team: Team) {
+    /*
     if(this.finish) return;
     if(this.match.nextMatch) {
       this.match.nextMatch.team1 = team;
     }
+    */
   }
 
   onMouseLeave(team: Team) {
+    /*
     if(this.finish) return;
     this.match.nextMatch.team1 = null;
     this.match.nextMatch.team2 = null;
+    */
   }
 
 }

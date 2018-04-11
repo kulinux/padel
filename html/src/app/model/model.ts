@@ -17,6 +17,17 @@ export class Tournament {
     matches: Array<Match> = [];
 }
 
+export class MatchResult {
+  match: Match;
+  winner: Team;
+
+  constructor(match: Match, winner: Team) {
+    this.match = match;
+    this.winner = winner;
+  }
+
+}
+
 export function matchesOfLevel(
   mtches: Array<Match>,
   level: number) : Array<Match>

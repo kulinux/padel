@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import {Match, matchesOfLevel, numberOfLevels} from '../../model/model'
+import {Match, MatchResult, matchesOfLevel, numberOfLevels} from '../../model/model'
 
 @Component({
   selector: 'app-matches',
@@ -17,6 +17,19 @@ export class MatchesComponent implements OnInit {
     this.allMatches = this.computeAllMatches()
   }
 
+  matchFinished(result: MatchResult) {
+    if(result.match.nextMatch.team1 == undefined)
+    {
+      result.match.nextMatch.team1 = result.winner;
+      return;
+    }
+    if(result.match.nextMatch.team2 == undefined)
+    {
+      result.match.nextMatch.team2 = result.winner;
+      return;
+    }
+    console.log("Match Finished");
+  }
 
 
   private computeAllMatches() {
