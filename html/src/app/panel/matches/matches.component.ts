@@ -1,5 +1,12 @@
 import { Component, OnInit, Input } from '@angular/core';
-import {Match, MatchResult, matchesOfLevel, numberOfLevels} from '../../model/model'
+import { Match, MatchResult, matchesOfLevel, numberOfLevels } from '../../model/model';
+import { RestService } from '../../services/rest.service';
+
+
+import { Observable } from 'rxjs/Observable';
+import { Subject }    from 'rxjs/Subject';
+import { of }         from 'rxjs/observable/of';
+
 
 @Component({
   selector: 'app-matches',
@@ -11,7 +18,7 @@ export class MatchesComponent implements OnInit {
   @Input() matches: Array<Match>;
   allMatches: Array<Array<Match>>;
 
-  constructor() { }
+  constructor(private rest: RestService) { }
 
   ngOnInit() {
     this.allMatches = this.computeAllMatches()
@@ -20,14 +27,19 @@ export class MatchesComponent implements OnInit {
   matchFinished(result: MatchResult) {
     if(result.match.nextMatch.team1 == undefined)
     {
+      this.rest.win(result)
+        .subscribe( res => console.log(res) );
       result.match.nextMatch.team1 = result.winner;
       return;
     }
     if(result.match.nextMatch.team2 == undefined)
     {
+      this.rest.win(result)
+        .subscribe( res => console.log(res) );
       result.match.nextMatch.team2 = result.winner;
       return;
     }
+
     console.log("Match Finished");
   }
 
