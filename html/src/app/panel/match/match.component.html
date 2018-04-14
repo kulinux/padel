@@ -1,22 +1,30 @@
-<div class="card">
-  <div class="card-body match">
+<div class="card match">
+  <div class="card-body match-body">
     <ul class="list-group list-group-flush">
-      <li class="list-group-item"
+      <div class="list-group-item team"
         *ngIf="match.team1 != null"
         on-mouseover="onMouseOver(match.team1)"
         on-mouseleave="onMouseLeave()"
         on-click="onMouseClick(match.team1)">
-        {{match.team1.name}} :
-        {{match.team1.player1}} - {{match.team1.player2}}
-      </li>
-      <li class="list-group-item"
+        <div class="team-name">
+          {{match.team1.name}}
+        </div>
+        <div class="team-components">
+          {{match.team1.player1}} - {{match.team1.player2}}
+        </div>
+      </div>
+      <div class="list-group-item team"
         *ngIf="match.team2 != null"
         on-mouseover="onMouseOver(match.team2)"
         on-mouseleave="onMouseLeave()"
         on-click="onMouseClick(match.team2)">
-        {{match.team2.name}} :
-        {{match.team2.player1}} - {{match.team2.player2}}
-      </li>
+        <div class="team-name">
+          {{match.team2.name}}
+        </div>
+        <div class="team-components">
+          {{match.team2.player1}} - {{match.team2.player2}}
+        </div>
+      </div>
     </ul>
   </div>
 </div>

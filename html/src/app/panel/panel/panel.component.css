@@ -1,4 +1,7 @@
 
+.panel {
+  margin: 10px;
+}
 .players-container {
   display: flex;
   flex-direction: column;

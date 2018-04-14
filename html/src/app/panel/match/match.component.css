@@ -1,2 +1,15 @@
 .match {
+  margin-bottom: 0.5rem
+}
+
+.match-body {
+  font-size: small;
+  padding: 0rem;
+}
+
+.team {
+  padding: 0.5rem;
+}
+
+.team-name {
 }
