@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package com.padel.protbuffers;
+
+message Player {
+  string id = 1;
+  string name = 2;
+}
+
+message Team {
+  string id = 1;
+  string name = 2;
+  string player1 = 3;
+  string player2 = 4;
+}
+
+message Match {
+  string id = 1;
+  string team1 = 2;
+  string team2 = 3;
+}
+
+message Ronda {
+  string id = 1;
+  repeated Match matches = 2;
+}
+
+message Tournament {
+  string id = 1;
+  repeated Team teams = 2;
+  repeated Ronda rondas = 3;
+}
+
+message MatchResult {
+  string id = 1;
+  string match = 2;
+  string winner = 3;
+}
