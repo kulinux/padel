@@ -10,7 +10,7 @@ class WebServerSpec extends WordSpec with Matchers with ScalatestRouteTest {
   val route = new Routes() {
 
     override def actorRef: ActorRef =
-      system.actorOf(Props[GetPlayersActor])
+      system.actorOf(Props[PlayerActor])
   }
 
   "Service" should {
