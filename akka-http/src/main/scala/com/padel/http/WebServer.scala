@@ -52,7 +52,7 @@ object WebServer extends Routes {
 
   implicit val materializer = ActorMaterializer()
 
-  override def actorRef: ActorRef = system.actorOf(PlayerActor.props())
+  override val actorRef: ActorRef = system.actorOf(PlayerActor.props())
 
   def main(args: Array[String]): Unit = {
     val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)

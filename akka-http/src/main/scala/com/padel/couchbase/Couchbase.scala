@@ -74,7 +74,7 @@ object Couchbase {
     val bucket = cluster.openBucket("acc")
 
     val resFut = bucket map (sc =>
-      system.actorOf(Props(new Couchbase(sc)), "CouchbasePlayer"))
+      system.actorOf(Props(new Couchbase(sc)), "Couchbase"))
 
     Await.result(resFut, 10.seconds)
   }
