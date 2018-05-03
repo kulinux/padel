@@ -1,14 +1,15 @@
 package com.padel.couchbase
 
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
-import com.couchbase.client.java.query.{AsyncN1qlQueryResult, N1qlQuery}
+import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
+import com.couchbase.client.java.query.{ AsyncN1qlQueryResult, N1qlQuery }
 import com.padel.couchbase.Couchbase.All
-import com.padel.couchbase.Model.{Identificable, Player}
+import com.padel.couchbase.Model.{ Identificable, Player }
 import com.sandinh.couchbase.document.JsDocument
-import com.sandinh.couchbase.{CBCluster, ScalaBucket}
+import com.sandinh.couchbase.{ CBCluster, ScalaBucket }
 import com.typesafe.config.ConfigFactory
-import play.api.libs.json.{JsSuccess, JsValue, Json}
+import play.api.libs.json.{ JsSuccess, JsValue, Json }
 
+import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -27,19 +28,19 @@ object JsonFormatters {
   implicit val fmtR = Json.reads[Player]
 }
 
-class Couchbase(bucket : ScalaBucket)
-  extends Actor {
+class Couchbase(bucket: ScalaBucket)
+    extends Actor {
   import JsonFormatters._
-
 
   override def receive: Receive = {
     case p: Player => {
       val toCouch = fmtW.writes(p)
-      bucket.insert( JsDocument(p.id, toCouch) )
+      bucket.insert(JsDocument(p.id, toCouch))
     }
 
     case All => {
       val snd = sender()
+      val allPlayers = mutable.ListBuffer.empty[Player]
       val result = bucket.query(N1qlQuery.simple(" SELECT * FROM `acc`"))
         .map(
           _.rows().subscribe(res => {
@@ -50,20 +51,21 @@ class Couchbase(bucket : ScalaBucket)
               )
 
             parsed match {
-              case JsSuccess(player, _) => snd ! player
+              case JsSuccess(player, _) =>
+                allPlayers += player
               case other => println(s"ERROR $other")
             }
-          } )
+          })
         )
+
+      result.map(x => snd ! allPlayers)
     }
   }
 }
 
-
 object Couchbase {
 
   case class All()
-
 
   def newInstance(system: ActorSystem): ActorRef = {
 
@@ -72,8 +74,7 @@ object Couchbase {
     val bucket = cluster.openBucket("acc")
 
     val resFut = bucket map (sc =>
-      system.actorOf(Props(new Couchbase(sc)), "CouchbasePlayer")
-    )
+      system.actorOf(Props(new Couchbase(sc)), "CouchbasePlayer"))
 
     Await.result(resFut, 10.seconds)
   }
