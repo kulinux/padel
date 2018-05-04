@@ -20,6 +20,8 @@ lazy val root = (project in file(".")).
       "com.typesafe.akka" %% "akka-http-xml"        % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-stream"          % akkaVersion,
       "com.sandinh" %% "couchbase-scala" % "7.4.1",
+      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.7.0",
+
 
       "com.typesafe.akka" %% "akka-http-testkit"    % akkaHttpVersion % Test,
       "com.typesafe.akka" %% "akka-testkit"         % akkaVersion     % Test,

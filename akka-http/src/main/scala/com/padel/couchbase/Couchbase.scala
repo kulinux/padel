@@ -2,7 +2,7 @@ package com.padel.couchbase
 
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
 import com.couchbase.client.java.query.{ AsyncN1qlQueryResult, N1qlQuery }
-import com.padel.couchbase.Couchbase.All
+import com.padel.couchbase.Couchbase.{ All, GetPlayer }
 import com.padel.couchbase.Model.{ Identificable, Player }
 import com.sandinh.couchbase.document.JsDocument
 import com.sandinh.couchbase.{ CBCluster, ScalaBucket }
@@ -38,6 +38,12 @@ class Couchbase(bucket: ScalaBucket)
       bucket.insert(JsDocument(p.id, toCouch))
     }
 
+    case Couchbase.GetPlayer(id) => {
+      val snd = sender()
+      val result = bucket.getJsT[Player](id)
+        .map(snd ! Couchbase.GetPlayerResponse(_))
+    }
+
     case All => {
       val snd = sender()
       val allPlayers = mutable.ListBuffer.empty[Player]
@@ -66,6 +72,8 @@ class Couchbase(bucket: ScalaBucket)
 object Couchbase {
 
   case class All()
+  case class GetPlayer(id: String)
+  case class GetPlayerResponse(player: Model.Player)
 
   def newInstance(system: ActorSystem): ActorRef = {
 

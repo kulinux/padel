@@ -1,25 +1,26 @@
 package com.padel.http
 
-import akka.actor.{ ActorRef, ActorSystem, Props }
+import akka.actor.{ ActorRef, ActorSystem }
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.marshalling.{ Marshaller, ToResponseMarshallable, ToResponseMarshaller }
+import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.stream.ActorMaterializer
-import com.padel.protbuffers.padel.Player
 import akka.pattern.ask
+import akka.stream.ActorMaterializer
 import akka.util.{ ByteString, Timeout }
-import com.padel.couchbase.Model
+import com.padel.http.PlayerActor.GetPlayerResponse
+import com.padel.protbuffers.padel.Player
+import scalapb.json4s.JsonFormat
 
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.duration._
 
 trait Routes {
 
+  /*
   def marshallPlayer(p: Player): MessageEntity =
     HttpEntity.Strict(ContentTypes.`application/grpc+proto`, ByteString(p.toProtoString))
 
@@ -27,23 +28,39 @@ trait Routes {
     HttpEntity.Strict(ContentTypes.`application/grpc+proto`, ByteString(
       "[" + p.map(_.toProtoString).mkString(",") + "]"
     ))
+    */
+  def marshallPlayer(p: Player): MessageEntity =
+    HttpEntity.Strict(ContentTypes.`application/json`, ByteString(JsonFormat.toJsonString(p)))
+
+  def marshallListPlayer(p: ListBuffer[Player]): MessageEntity =
+    HttpEntity.Strict(ContentTypes.`application/json`, ByteString(
+      "[" + p.map(JsonFormat.toJsonString(_)).mkString(",") + "]"
+    ))
 
   implicit val marshallerPlayer = Marshaller.opaque[Player, MessageEntity](marshallPlayer)
   implicit val marshallerListPlayer = Marshaller.opaque[ListBuffer[Player], MessageEntity](marshallListPlayer)
 
   def actorRef: ActorRef
 
+  implicit val timeout: Timeout = 50.seconds
+
   val route: Route =
     path("players") {
       get {
-        implicit val timeout: Timeout = 50.seconds
-        val fut: Future[ListBuffer[Model.Player]] = (actorRef ? "ALL")
-          .mapTo[ListBuffer[Model.Player]]
-        val futWeb = fut.map(_.map(pl => Player(pl.id)))
-        complete(futWeb)
+        val fut: Future[ListBuffer[Player]] = (actorRef ? "ALL")
+          .mapTo[ListBuffer[Player]]
+        complete(fut)
       }
-    }
+    } ~
+      path("player" / Remaining) { idPlayer =>
+        {
+          val pr = (actorRef ? PlayerActor.GetPlayer(idPlayer))
+            .mapTo[GetPlayerResponse]
+            .map(_.player)
 
+          complete(pr)
+        }
+      }
 }
 
 object WebServer extends Routes {
