@@ -58,6 +58,8 @@ trait Routes {
             .mapTo[GetPlayerResponse]
             .map(_.player)
 
+          pr.onComplete(println)
+
           complete(pr)
         }
       }

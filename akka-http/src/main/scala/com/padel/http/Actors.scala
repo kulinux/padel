@@ -31,7 +31,10 @@ class PlayerActor extends Actor {
       webActorRef = sender()
       cl ! All
     }
-    case PlayerActor.GetPlayer(id) => cl ! Couchbase.GetPlayer(id)
+    case PlayerActor.GetPlayer(id) => {
+      webActorRef = sender()
+      cl ! Couchbase.GetPlayer(id)
+    }
 
     case Couchbase.GetPlayerResponse(player) =>
       webActorRef ! PlayerActor.GetPlayerResponse(Player(id = player.id, name = player.name))
