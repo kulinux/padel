@@ -1,8 +1,7 @@
 package com.padel.http
 
-import akka.actor.{ Actor, ActorRef, Props }
-import com.padel.couchbase.Couchbase.All
-import com.padel.couchbase.{ Couchbase, Model }
+import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
+import com.padel.couchbase.{ Couchbase, CouchbaseActors, Model }
 import com.padel.http.PlayerActor.{ GetPlayer, GetPlayerResponse }
 import com.padel.protbuffers.padel.Player
 
@@ -20,26 +19,26 @@ object PlayerActor {
   def props() = Props[PlayerActor]
 }
 
-class PlayerActor extends Actor {
+class PlayerActor extends Actor with CouchbaseActors {
 
-  val cl = Couchbase.newInstance(context.system)
+  import CouchbaseActors._
 
   var webActorRef: ActorRef = null
 
   override def receive: Receive = {
     case "ALL" => {
       webActorRef = sender()
-      cl ! All
+      cbPlayer ! All
     }
     case PlayerActor.GetPlayer(id) => {
       webActorRef = sender()
-      cl ! Couchbase.GetPlayer(id)
+      cbPlayer ! GetPlayer(id)
     }
 
-    case Couchbase.GetPlayerResponse(player) =>
+    case GetPlayerResponse(player) =>
       webActorRef ! PlayerActor.GetPlayerResponse(Player(id = player.id, name = player.name))
 
-    case player: Player => cl ! player
+    case player: Player => cbPlayer ! player
 
     case players: ListBuffer[Model.Player] =>
       webActorRef ! players.map(pl => Player(pl.id))

@@ -1,5 +1,5 @@
 lazy val akkaHttpVersion = "10.1.1"
-lazy val akkaVersion    = "2.5.12"
+lazy val akkaVersion    = "2.5.2"
 
 
 PB.protoSources in Compile := Seq(new java.io.File("../protobuffers"))
@@ -14,15 +14,14 @@ lazy val root = (project in file(".")).
       scalaVersion    := "2.12.5"
     )),
     name := "akka-http",
+    resolvers ++= Seq("reactivecouchbase-rs-snapshots" at "https://raw.github.com/ReactiveCouchbase/reactivecouchbase-rs-core/master/repository/snapshots",
+      "reactivecouchbase-rs-releases" at "https://raw.github.com/ReactiveCouchbase/reactivecouchbase-rs-core/master/repository/releases"),
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http"            % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-http-xml"        % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-stream"          % akkaVersion,
-      "com.sandinh" %% "couchbase-scala" % "7.4.1",
-      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.7.0",
-
-
+      "org.reactivecouchbase" %% "reactivecouchbase-rs-core" % "1.0.0",
       "com.typesafe.akka" %% "akka-http-testkit"    % akkaHttpVersion % Test,
       "com.typesafe.akka" %% "akka-testkit"         % akkaVersion     % Test,
       "com.typesafe.akka" %% "akka-stream-testkit"  % akkaVersion     % Test,

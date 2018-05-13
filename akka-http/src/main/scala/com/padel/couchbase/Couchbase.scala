@@ -1,90 +1,117 @@
 package com.padel.couchbase
 
-import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
-import com.couchbase.client.java.query.{ AsyncN1qlQueryResult, N1qlQuery }
-import com.padel.couchbase.Couchbase.{ All, GetPlayer }
-import com.padel.couchbase.Model.{ Identificable, Player }
-import com.sandinh.couchbase.document.JsDocument
-import com.sandinh.couchbase.{ CBCluster, ScalaBucket }
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.Sink
+import org.reactivecouchbase.rs.scaladsl.json._
+import com.padel.couchbase.CouchbaseActors.{AllJson, GetJson, GetResponseJson, InsertJson}
+import com.padel.couchbase.Model.{Identificable, Player}
 import com.typesafe.config.ConfigFactory
-import play.api.libs.json.{ JsSuccess, JsValue, Json }
-
-import scala.collection.mutable
-import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
+import org.reactivecouchbase.rs.scaladsl.{N1qlQuery, ReactiveCouchbase}
+import play.api.libs.json.{JsObject, JsValue, Json}
 
 object Model {
   trait Identificable {
     def id: String
   }
 
-  case class Player(id: String, name: String) extends Identificable
+  case class Player(
+    id: String,
+    name: String
+  ) extends Identificable
+
+  case class Team(
+    id: String,
+    player1: String,
+    player2: String
+  )
+
+  case class Match(
+    id: String,
+    team: Team
+  )
+
+  case class Round(
+    id: String,
+    matches: Match
+  ) extends Identificable
+
+  case class Tournament(
+    id: String,
+    name: String,
+    players: Seq[Player],
+    rounds: Round
+  ) extends Identificable
 }
 
-object JsonFormatters {
-  implicit val fmtP = Json.format[Player]
-  implicit val fmtW = Json.writes[Player]
-  implicit val fmtR = Json.reads[Player]
+trait CouchbaseActors extends Actor {
+  val cbPlayer: ActorRef = ???
+
+
+
+
 }
 
-class Couchbase(bucket: ScalaBucket)
+object CouchbaseActors {
+  case class All()
+  case class Insert[T <: Identificable](player: T)
+  case class Get(id: String)
+  case class GetResponse[T <: Identificable](player: T)
+
+  case class AllJson()
+  case class InsertJson(id: String, js: JsValue)
+  case class GetJson(id: String)
+  case class GetResponseJson(js: Seq[JsValue])
+
+}
+
+trait Couchbase
     extends Actor {
-  import JsonFormatters._
+
+  def bucketName: String
+
+
+  val system = context.system
+
+  implicit val materializer = ActorMaterializer.create(system)
+  implicit val ec = system.dispatcher
+
+  val driver = ReactiveCouchbase(ConfigFactory.load())
+
+  val bucket = driver.bucket(bucketName)
 
   override def receive: Receive = {
-    case p: Player => {
-      val toCouch = fmtW.writes(p)
-      bucket.insert(JsDocument(p.id, toCouch))
+    case InsertJson(id, js) => {
+      bucket.insert[JsValue](
+        id,
+        js
+      )
+    }
+    case GetJson(id) => {
+      for( docs <- bucket.search(
+        N1qlQuery( "select * from " + bucketName + " where id = $id")
+          .on(Json.obj("id" -> id).asQueryParams)
+      ).asSeq ) {
+        docs.map( _ \\ bucketName )
+            .map( sender() ! GetResponseJson(_) )
+      }
+    }
+    case AllJson() => {
+      for( docs <- bucket.search(
+        N1qlQuery( "select * from " + bucketName )
+      ).asSeq ) {
+        docs.map( _ \\ bucketName )
+          .map( sender() ! GetResponseJson(_) )
+      }
+
     }
 
-    case Couchbase.GetPlayer(id) => {
-      val snd = sender()
-      val result = bucket.getJsT[Player](id)
-        .map(snd ! Couchbase.GetPlayerResponse(_))
-    }
-
-    case All => {
-      val snd = sender()
-      val allPlayers = mutable.ListBuffer.empty[Player]
-      val result = bucket.query(N1qlQuery.simple(" SELECT * FROM `acc`"))
-        .map(
-          _.rows().subscribe(res => {
-            val str = res.value().get("acc")
-            val parsed =
-              fmtR.reads(
-                Json.parse(str.toString)
-              )
-
-            parsed match {
-              case JsSuccess(player, _) =>
-                allPlayers += player
-              case other => println(s"ERROR $other")
-            }
-          })
-        )
-
-      result.map(x => snd ! allPlayers)
-    }
   }
+
+
+
 }
 
-object Couchbase {
-
-  case class All()
-  case class GetPlayer(id: String)
-  case class GetPlayerResponse(player: Model.Player)
-
-  def newInstance(system: ActorSystem): ActorRef = {
-
-    val config = ConfigFactory.load()
-    val cluster = new CBCluster(config)
-    val bucket = cluster.openBucket("acc")
-
-    val resFut = bucket map (sc =>
-      system.actorOf(Props(new Couchbase(sc)), "Couchbase"))
-
-    Await.result(resFut, 10.seconds)
-  }
+private object Couchbase {
 
 }

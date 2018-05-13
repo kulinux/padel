@@ -11,7 +11,6 @@ import akka.stream.ActorMaterializer
 import akka.util.{ ByteString, Timeout }
 import com.padel.http.PlayerActor.GetPlayerResponse
 import com.padel.protbuffers.padel.Player
-import scalapb.json4s.JsonFormat
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -20,7 +19,6 @@ import scala.concurrent.duration._
 
 trait Routes {
 
-  /*
   def marshallPlayer(p: Player): MessageEntity =
     HttpEntity.Strict(ContentTypes.`application/grpc+proto`, ByteString(p.toProtoString))
 
@@ -28,7 +26,7 @@ trait Routes {
     HttpEntity.Strict(ContentTypes.`application/grpc+proto`, ByteString(
       "[" + p.map(_.toProtoString).mkString(",") + "]"
     ))
-    */
+  /*
   def marshallPlayer(p: Player): MessageEntity =
     HttpEntity.Strict(ContentTypes.`application/json`, ByteString(JsonFormat.toJsonString(p)))
 
@@ -36,6 +34,7 @@ trait Routes {
     HttpEntity.Strict(ContentTypes.`application/json`, ByteString(
       "[" + p.map(JsonFormat.toJsonString(_)).mkString(",") + "]"
     ))
+    */
 
   implicit val marshallerPlayer = Marshaller.opaque[Player, MessageEntity](marshallPlayer)
   implicit val marshallerListPlayer = Marshaller.opaque[ListBuffer[Player], MessageEntity](marshallListPlayer)
@@ -45,24 +44,26 @@ trait Routes {
   implicit val timeout: Timeout = 50.seconds
 
   val route: Route =
-    path("players") {
+    pathPrefix("player") {
       get {
-        val fut: Future[ListBuffer[Player]] = (actorRef ? "ALL")
-          .mapTo[ListBuffer[Player]]
-        complete(fut)
-      }
-    } ~
-      path("player" / Remaining) { idPlayer =>
-        {
-          val pr = (actorRef ? PlayerActor.GetPlayer(idPlayer))
-            .mapTo[GetPlayerResponse]
-            .map(_.player)
+        pathEndOrSingleSlash {
+          val fut: Future[ListBuffer[Player]] = (actorRef ? "ALL")
+            .mapTo[ListBuffer[Player]]
+          complete(fut)
+        } ~
+          path(Remaining) { idPlayer =>
+            {
+              val pr = (actorRef ? PlayerActor.GetPlayer(idPlayer))
+                .mapTo[GetPlayerResponse]
+                .map(_.player)
 
-          pr.onComplete(println)
+              pr.onComplete(println)
 
-          complete(pr)
-        }
+              complete(pr)
+            }
+          }
       }
+    }
 }
 
 object WebServer extends Routes {
@@ -76,10 +77,5 @@ object WebServer extends Routes {
   def main(args: Array[String]): Unit = {
     val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 
-    /*
-    bindingFuture
-      .flatMap(_.unbind())
-      .onComplete(_ => system.terminate())
-      */
   }
 }

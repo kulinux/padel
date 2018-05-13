@@ -1,10 +1,11 @@
 package com.padel.http
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.{ ActorRef, Props }
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.padel.http.WebServer.system
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Ignore, Matchers, WordSpec }
 
+@Ignore
 class WebServerSpec extends WordSpec with Matchers with ScalatestRouteTest {
 
   val route = new Routes() {
