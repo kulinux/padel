@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
 import org.reactivecouchbase.rs.scaladsl.json._
-import com.padel.couchbase.CouchbaseActors.{AllJson, GetJson, GetResponseJson, InsertJson}
+import com.padel.couchbase.CouchbaseActors._
 import com.padel.couchbase.Model.{Identificable, Player}
 import com.typesafe.config.ConfigFactory
 import org.reactivecouchbase.rs.scaladsl.{N1qlQuery, ReactiveCouchbase}
@@ -62,6 +62,8 @@ object CouchbaseActors {
   case class InsertJson(id: String, js: JsValue)
   case class GetJson(id: String)
   case class GetResponseJson(js: Seq[JsValue])
+  case class RemoveJson(id: String)
+  case class AckJson()
 
 }
 
@@ -82,28 +84,34 @@ trait Couchbase
 
   override def receive: Receive = {
     case InsertJson(id, js) => {
+      val snd = sender()
       bucket.insert[JsValue](
         id,
         js
-      )
+      ).map( _ => snd ! AckJson() )
     }
     case GetJson(id) => {
+      val snd = sender()
       for( docs <- bucket.search(
         N1qlQuery( "select * from " + bucketName + " where id = $id")
           .on(Json.obj("id" -> id).asQueryParams)
       ).asSeq ) {
         docs.map( _ \\ bucketName )
-            .map( sender() ! GetResponseJson(_) )
+            .map( snd ! GetResponseJson(_) )
       }
     }
     case AllJson() => {
+      val snd = sender()
       for( docs <- bucket.search(
         N1qlQuery( "select * from " + bucketName )
       ).asSeq ) {
-        docs.map( _ \\ bucketName )
-          .map( sender() ! GetResponseJson(_) )
+        snd ! GetResponseJson( docs.flatMap( _ \\ bucketName ) )
       }
-
+    }
+    case RemoveJson(id) => {
+      val snd = sender()
+     bucket.remove(id)
+      .map( _ => snd ! AckJson() )
     }
 
   }
