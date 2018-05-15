@@ -1,8 +1,9 @@
 package com.padel.http
 
-import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
-import com.padel.couchbase.{ Couchbase, CouchbaseActors, Model }
-import com.padel.http.PlayerActor.{ GetPlayer, GetPlayerResponse }
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import com.padel.couchbase.CouchbaseFormatter.All
+import com.padel.couchbase.{Couchbase, CouchbaseActors, Model}
+import com.padel.http.PlayerActor.{GetPlayer, GetPlayerResponse}
 import com.padel.protbuffers.padel.Player
 
 import scala.collection.mutable.ListBuffer
@@ -28,7 +29,7 @@ class PlayerActor extends Actor with CouchbaseActors {
   override def receive: Receive = {
     case "ALL" => {
       webActorRef = sender()
-      cbPlayer ! All
+      cbPlayer ! All()
     }
     case PlayerActor.GetPlayer(id) => {
       webActorRef = sender()

@@ -12,7 +12,7 @@ class CouchbaseIt extends Actor {
   val actorRef = context.actorOf(Props[CouchbaseTest])
 
   actorRef ! InsertJson("test2", Json.obj("id" -> "test2", "dos" -> "dos2"))
-  //actorRef ! GetJson("test")
+  actorRef ! GetJson("test")
 
   actorRef ! AllJson()
   actorRef ! RemoveJson("test2")
