@@ -16,10 +16,10 @@ trait CouchbaseActors extends Actor {
 object CouchbaseActors {
 
 
-  case class AllJson()
+  case class AllJson(answerTo: ActorRef)
   case class InsertJson(id: String, js: JsValue)
-  case class GetJson(id: String)
-  case class GetResponseJson(js: Seq[JsValue])
+  case class GetJson(id: String, answerTo: ActorRef)
+  case class GetResponseJson(js: Seq[JsValue], answerTo: ActorRef)
   case class RemoveJson(id: String)
   case class AckJson()
 
@@ -48,22 +48,22 @@ trait Couchbase
         js
       ).map( _ => snd ! AckJson() )
     }
-    case GetJson(id) => {
+    case GetJson(id, actorRef) => {
       val snd = sender()
       for( docs <- bucket.search(
         N1qlQuery( "select * from " + bucketName + " where id = $id")
           .on(Json.obj("id" -> id).asQueryParams)
       ).asSeq ) {
         docs.map( _ \\ bucketName )
-            .map( snd ! GetResponseJson(_) )
+            .map( snd ! GetResponseJson(_, actorRef) )
       }
     }
-    case AllJson() => {
+    case AllJson(answerTo) => {
       val snd = sender()
       for( docs <- bucket.search(
         N1qlQuery( "select * from " + bucketName )
       ).asSeq ) {
-        snd ! GetResponseJson( docs.flatMap( _ \\ bucketName ) )
+        snd ! GetResponseJson( docs.flatMap( _ \\ bucketName ), answerTo )
       }
     }
     case RemoveJson(id) => {

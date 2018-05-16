@@ -1,14 +1,34 @@
 package com.padel.couchbase
 
 import akka.actor.{Actor, ActorRef}
-import com.padel.couchbase.CouchbaseActors.InsertJson
-import com.padel.couchbase.CouchbaseFormatter.Insert
+import com.padel.couchbase.CouchbaseActors._
+import com.padel.couchbase.CouchbaseFormatter._
 import com.padel.couchbase.Model.Identificable
-import play.api.libs.json.Writes
+import play.api.libs.json.{Reads, Writes}
 
-class CouchbaseFormatter[T <: Identificable] (cb: ActorRef, writer: Writes[T]) extends Actor {
+class CouchbaseFormatter[T <: Identificable]
+(
+  cb: ActorRef,
+  writer: Writes[T],
+  reader: Reads[T] ) extends Actor {
   override def receive: Receive = {
-    case Insert(obj: T) => cb.tell(InsertJson(obj.id, writer.writes(obj)), sender())
+    case Insert(obj: T) => {
+      cb ! InsertJson(obj.id, writer.writes(obj))
+    }
+    case Get(id) => {
+      cb ! GetJson(id, sender())
+    }
+    case GetResponseJson(jss, answerTo) => {
+      val res = jss.map( reader.reads(_) ).filter( _.isSuccess ).map( _.get )
+      answerTo ! GetResponse( res )
+    }
+    case All() => {
+      cb ! AllJson(sender())
+    }
+    case Remove(id) => {
+      cb ! RemoveJson(id)
+    }
+    case a => println(s"CouchbaseFormatter $a")
   }
 }
 
@@ -18,7 +38,8 @@ object CouchbaseFormatter {
   case class All()
   case class Insert[T <: Identificable](player: T)
   case class Get(id: String)
-  case class GetResponse[T <: Identificable](player: T)
+  case class Remove(id: String)
+  case class GetResponse[T <: Identificable](player: Seq[T])
 }
 
 object Model {
