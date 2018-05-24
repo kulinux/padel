@@ -59,6 +59,7 @@ trait Couchbase
       }
     }
     case AllJson(answerTo) => {
+      println("Bucket Name " + this.bucketName )
       val snd = sender()
       for( docs <- bucket.search(
         N1qlQuery( "select * from " + bucketName )

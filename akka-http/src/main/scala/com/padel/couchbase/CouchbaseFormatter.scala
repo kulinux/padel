@@ -19,7 +19,8 @@ class CouchbaseFormatter[T <: Identificable]
       cb ! GetJson(id, sender())
     }
     case GetResponseJson(jss, answerTo) => {
-      val res = jss.map( reader.reads(_) ).filter( _.isSuccess ).map( _.get )
+      val res: Seq[T] = jss.map( reader.reads(_) ).filter( _.isSuccess ).map( _.get )
+
       answerTo ! GetResponse( res )
     }
     case All() => {
@@ -36,10 +37,10 @@ class CouchbaseFormatter[T <: Identificable]
 object CouchbaseFormatter {
 
   case class All()
-  case class Insert[T <: Identificable](player: T)
+  case class Insert[T <% {def id: String}](player: T)
   case class Get(id: String)
   case class Remove(id: String)
-  case class GetResponse[T <: Identificable](player: Seq[T])
+  case class GetResponse[T <% {def id: String}](player: Seq[T])
 }
 
 object Model {
