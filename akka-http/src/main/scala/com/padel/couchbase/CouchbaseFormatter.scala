@@ -15,6 +15,9 @@ class CouchbaseFormatter[T <: Identificable]
     case Insert(obj: T) => {
       cb ! InsertJson(obj.id, writer.writes(obj))
     }
+    case Update(obj: T) => {
+      cb ! UpdateJson(obj.id, writer.writes(obj))
+    }
     case Get(id) => {
       cb ! GetJson(id, sender())
     }
@@ -38,8 +41,10 @@ object CouchbaseFormatter {
 
   case class All()
   case class Insert[T <% {def id: String}](player: T)
-  case class Get(id: String)
+  case class Update[T <% {def id: String}](player: T)
   case class Remove(id: String)
+  case class Ack()
+  case class Get(id: String)
   case class GetResponse[T <% {def id: String}](player: Seq[T])
 }
 

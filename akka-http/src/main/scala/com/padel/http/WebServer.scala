@@ -8,13 +8,9 @@ import akka.pattern.ask
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import com.padel.couchbase.{Couchbase, CouchbaseFormatter, Model}
-import com.padel.couchbase.CouchbaseFormatter.{All, Get, GetResponse}
-import com.padel.couchbase.Model.{Player, Team}
-import com.padel.protbuffers.padel.Player
+import com.padel.couchbase.CouchbaseFormatter._
 import play.api.libs.json.{Json, Reads, Writes}
-import com.padel.protbuffers.padel
 
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -43,9 +39,9 @@ trait Routes {
     */
 
 
-  implicit val timeout: Timeout = 50.seconds
+  implicit val timeout: Timeout = 300.seconds
 
-  def entityRoute[T](url: String,
+  def entityRoute[T <% {def id: String}](url: String,
                      writer: Writes[T],
                      reader: Reads[T],
                      actorRef: ActorRef
@@ -56,16 +52,12 @@ trait Routes {
           val fut: Future[GetResponse[T]] = (actorRef ? All())
             .mapTo[GetResponse[T]]
 
-          val futStr = fut
-            .map(_.player
-              .map(writer.writes(_)
-              )
-            )
+          val futStr = fut.map(_.player.map(writer.writes(_) ) )
             .map("[" + _.mkString(",") + "]")
 
           complete(futStr)
         } ~
-          path(Remaining) { id => {
+        path(Remaining) { id => {
             val pr = (actorRef ? Get(id))
               .mapTo[GetResponse[T]]
               .map(rsp => rsp.player)
@@ -74,9 +66,31 @@ trait Routes {
 
             complete(pr)
           }
-          }
+        }
+      } ~
+      post {
+          pathEndOrSingleSlash { entity(as[String]) { json => {
+            val js = Json.parse(json)
+            val fut : Future[Ack] = (actorRef ? Insert(reader.reads(js).get))
+              .mapTo[Ack]
+            complete(json)
+          } } }
+      } ~
+      delete {
+        path(Remaining) { id => {
+          val fut : Future[Ack] = (actorRef ? Remove(id))
+            .mapTo[Ack]
+          complete("")
+        } }
+      } ~
+      put {
+        pathEndOrSingleSlash { entity(as[String]) { json => {
+          val js = Json.parse(json)
+          val fut : Future[Ack] = (actorRef ? Update(reader.reads(js).get))
+            .mapTo[Ack]
+          complete(json)
+        } } }
       }
-
     }
   }
 }

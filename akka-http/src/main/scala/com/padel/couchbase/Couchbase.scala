@@ -18,6 +18,7 @@ object CouchbaseActors {
 
   case class AllJson(answerTo: ActorRef)
   case class InsertJson(id: String, js: JsValue)
+  case class UpdateJson(id: String, js: JsValue)
   case class GetJson(id: String, answerTo: ActorRef)
   case class GetResponseJson(js: Seq[JsValue], answerTo: ActorRef)
   case class RemoveJson(id: String)
@@ -48,6 +49,13 @@ trait Couchbase
         js
       ).map( _ => snd ! AckJson() )
     }
+    case UpdateJson(id, js) => {
+      val snd = sender()
+      bucket.upsert[JsValue](
+        id,
+        js
+      ).map( _ => snd ! AckJson() )
+    }
     case GetJson(id, actorRef) => {
       val snd = sender()
       for( docs <- bucket.search(
@@ -59,7 +67,6 @@ trait Couchbase
       }
     }
     case AllJson(answerTo) => {
-      println("Bucket Name " + this.bucketName )
       val snd = sender()
       for( docs <- bucket.search(
         N1qlQuery( "select * from " + bucketName )
