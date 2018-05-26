@@ -39,7 +39,7 @@ trait Routes {
     */
 
 
-  implicit val timeout: Timeout = 300.seconds
+  implicit val timeout: Timeout = 2.seconds
 
   def entityRoute[T <% {def id: String}](url: String,
                      writer: Writes[T],
@@ -61,6 +61,7 @@ trait Routes {
             val pr = (actorRef ? Get(id))
               .mapTo[GetResponse[T]]
               .map(rsp => rsp.player)
+              .filter(_.isEmpty == false)
               .map(rsp => writer.writes(rsp(0)))
               .map(_.toString())
 

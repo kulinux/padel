@@ -58,12 +58,16 @@ trait Couchbase
     }
     case GetJson(id, actorRef) => {
       val snd = sender()
-      for( docs <- bucket.search(
-        N1qlQuery( "select * from " + bucketName + " where id = $id")
-          .on(Json.obj("id" -> id).asQueryParams)
-      ).asSeq ) {
+      val searchFut =
+        bucket.search(
+          N1qlQuery( "select * from " + bucketName + " where id = $id")
+            .on(Json.obj("id" -> id).asQueryParams)
+        ).asSeq
+
+      for( docs <- searchFut ) {
         docs.map( _ \\ bucketName )
             .map( snd ! GetResponseJson(_, actorRef) )
+        if(docs.isEmpty) snd ! GetResponseJson(Seq(), actorRef)
       }
     }
     case AllJson(answerTo) => {
@@ -75,7 +79,7 @@ trait Couchbase
       }
     }
     case RemoveJson(id) => {
-      val snd = sender()
+     val snd = sender()
      bucket.remove(id)
       .map( _ => snd ! AckJson() )
     }
