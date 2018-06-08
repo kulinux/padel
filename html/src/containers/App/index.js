@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 
 import { getAPIData } from './actions';
 import { selectApiData } from './selectors';
+import { Menu, data } from '../Recipe';
 
 import logo from './images/logo.svg';
 
@@ -20,6 +21,7 @@ class App extends Component {
   render() {
     return (
       <div className="app">
+        <Menu recipes={data}></Menu>
         <div className="app-header">
           <img src={logo} className="app-logo" alt="logo" />
           <h2>Welcome to React!!</h2>
