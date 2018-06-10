@@ -1,4 +1,4 @@
-import {MATCH_FINISHED, ADD_TEAM} from './constants'
+import {MATCH_FINISHED, ADD_TEAM} from '../../constants'
 
 
 const initialState = {
@@ -31,7 +31,7 @@ const initialState = {
 }
 
 
-const matchReducer = (state = {}, action) => {
+export const matchReducer = (state = {}, action) => {
   switch (action.type) {
     case MATCH_FINISHED:
         return {
@@ -43,7 +43,7 @@ const matchReducer = (state = {}, action) => {
   }
 }
 
-const tournmanentReducer = (state = initialState, action) => {
+export const tournmanentReducer = (state = initialState, action) => {
   switch (action.type) {
     case ADD_TEAM:
       return {
