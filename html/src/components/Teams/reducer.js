@@ -31,35 +31,16 @@ const initialState = {
 }
 
 
-export const matchReducer = (state = {}, action) => {
-  switch (action.type) {
-    case MATCH_FINISHED:
-        return {
-          id: "matchA", team1: "team1", team2: "team2", finished: true, nextMatch: "matchE"
-        };
-      break;
-    default:
-      return state
-  }
-}
-
-export const tournmanentReducer = (state = initialState, action) => {
+export const teamsReducer = (state = initialState, action) => {
   switch (action.type) {
     case ADD_TEAM:
       return {
         ...state, teams: [...state.teams, action.payload]
       };
-    case MATCH_FINISHED:
-      return  {
-        matches: state.matches.map(
-          match => matchReducer(match, action)
-        )
-      }
-      break;
     default:
       return state
 
   }
 }
 
-export default tournmanentReducer;
+export default teamsReducer;

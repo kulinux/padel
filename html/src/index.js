@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { Teams } from './components/Tournament';
+import { Teams } from './components/Teams';
+import { App } from './containers/App';
 import store from './store'
 import './styles/main.css';
 
@@ -9,7 +10,7 @@ import './styles/main.css';
 
 ReactDOM.render(
   <Provider store={store}>
-    <Teams/>
+    <App/>
   </Provider>,
   document.getElementById('root'),
 );

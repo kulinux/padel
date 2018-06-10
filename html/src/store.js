@@ -1,11 +1,11 @@
 import { createStore, combineReducers, applyMiddleware} from 'redux';
 
-import tournmanentReducer from './components/Tournament/reducer'
+import {teamsReducer} from './components/Teams/reducer'
 
 const logger = store => next => action => {
   console.log('action invoked')
 }
 
-const store = createStore( tournmanentReducer )
+const store = createStore( teamsReducer )
 
 export default store
