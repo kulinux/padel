@@ -1,10 +1,30 @@
 import React from 'react';
+import {Match} from '../Match';
+import {connect} from 'react-redux';
 
-export const Panel = ({rowMatches}) => (
-  <div className="row-matches">
+
+const mapStateToProps = state => {
+  return { matches: state.matches };
+};
+
+const MatchRow = ({matchRow}) => (
+  <div className="match-row">
+    MatchRow
     {
-      rowMatches =>
-        rowMatches.map( (match) => <Match match={match}/>)
+        matchRow.map( (match) => <Match match={match}/>)
+    }
+  </div>
+)
+
+export const ConnectedPanel = ({matches}) => (
+  <div className="matches">
+    {
+        matches.map( (match) => <MatchRow matchRow={match}/>)
     }
   </div>
 );
+
+
+export const Panel = connect(mapStateToProps)(ConnectedPanel);
+
+export default Panel;

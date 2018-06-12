@@ -1,5 +1,6 @@
 import React from 'react';
 import {Teams} from '../../components/Teams';
+import {Panel} from '../../components/Panel';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -16,6 +17,7 @@ export const App = () => (
     </div>
     <div className="row tournament">
       <div className="col-10">
+        <Panel/>
       </div>
       <div className="col-2">
         <Teams/>

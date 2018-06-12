@@ -8,7 +8,7 @@ const Team = ({name}) => (
 );
 
 
-const Match =  (props) => (
+export const Match =  (props) => (
   <div class="match">
     <Team name="team uno"/>
     <Team name="team dos"/>
