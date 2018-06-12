@@ -13,7 +13,6 @@ export const ConnectedTeams = ({teams}) => (
       <AddTeamForm key="addTeamForm"/>
       <div key="teams" className="teams">
         <ul>
-          { teams.map( team => console.log(team) ) }
           { teams.map( team => <li key={team.id}>{team.name}</li> ) }
         </ul>
       </div>

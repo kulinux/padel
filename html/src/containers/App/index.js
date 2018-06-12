@@ -1,9 +1,25 @@
 import React from 'react';
-import {Teams} from '../../components/Teams'
+import {Teams} from '../../components/Teams';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 export const App = () => (
-  <div className="app">
-    <Teams/>
+  <div className="container-fluid">
+    <div className="row">
+      <div className="col hero">
+        <div className="hero-text">
+          <h1>
+          Padel again, and again....
+          </h1>
+        </div>
+      </div>
+    </div>
+    <div className="row tournament">
+      <div className="col-10">
+      </div>
+      <div className="col-2">
+        <Teams/>
+      </div>
+    </div>
   </div>
 );

@@ -1,7 +1,8 @@
-import React, {Component} from 'react'
-import {connect} from 'react-redux'
-import uuidv1 from 'uuid'
-import {addTeam} from '../../actions'
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import uuidv1 from 'uuid';
+import {addTeam} from '../../actions';
+
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -39,9 +40,15 @@ class AddTeamFormConnected extends Component {
     const { name } = this.state;
     return (
       <form onSubmit={this.handleSubmit}>
-        <label htmlFor="name">Name</label>
-        <input id="name" value={name} onChange={this.handleOnChange}/>
-        <button type="submit">Add Team</button>
+        <div className="form-group">
+          <div className="input-group mb3">
+            <input id="name" className="form-control" placeholder="Name"
+              value={name} onChange={this.handleOnChange}/>
+            <div className="input-group-append">
+              <button className="btn btn-outline-secondary" type="submit">Add Team</button>
+            </div>
+          </div>
+        </div>
       </form>
     );
   }
