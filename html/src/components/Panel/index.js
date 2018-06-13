@@ -1,15 +1,16 @@
 import React from 'react';
 import {Match} from '../Match';
 import {connect} from 'react-redux';
+import './styles.css';
 
 
 const mapStateToProps = state => {
   return { matches: state.matches };
 };
 
-const MatchRow = ({matchRow}) => (
-  <div className="match-row">
-    MatchRow
+const MatchRow = ({matchRow, ronda}) => (
+  <div className="match-row col">
+    <div className="text-center">Ronda {ronda + 1}</div>
     {
         matchRow.map( (match) => <Match match={match}/>)
     }
@@ -17,10 +18,11 @@ const MatchRow = ({matchRow}) => (
 )
 
 export const ConnectedPanel = ({matches}) => (
-  <div className="matches">
-    {
-        matches.map( (match) => <MatchRow matchRow={match}/>)
-    }
+  <div className="matches container-responsive">
+    <div className="row">
+       {
+        matches.map( (match, i) => <MatchRow matchRow={match} ronda={i}/>)
+    } </div>
   </div>
 );
 

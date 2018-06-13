@@ -40,12 +40,15 @@ class AddTeamFormConnected extends Component {
     const { name } = this.state;
     return (
       <form onSubmit={this.handleSubmit}>
+        <div class="glyphicon glyphicon-search" aria-hidden="true"></div>
         <div className="form-group">
           <div className="input-group mb3">
             <input id="name" className="form-control" placeholder="Name"
               value={name} onChange={this.handleOnChange}/>
             <div className="input-group-append">
-              <button className="btn btn-outline-secondary" type="submit">Add Team</button>
+              <button className="btn btn-default btn-outline-secondary" type="submit">
+                <span className="glyphicon glyphicon-align-left" aria-hidden="true"></span>
+                Add</button>
             </div>
           </div>
         </div>

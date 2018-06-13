@@ -16,10 +16,10 @@ export const App = () => (
       </div>
     </div>
     <div className="row tournament">
-      <div className="col-10">
+      <div className="col">
         <Panel/>
       </div>
-      <div className="col-2">
+      <div className="col-2 d-none d-sm-block">
         <Teams/>
       </div>
     </div>
