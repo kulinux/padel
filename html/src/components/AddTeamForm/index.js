@@ -47,8 +47,8 @@ class AddTeamFormConnected extends Component {
               value={name} onChange={this.handleOnChange}/>
             <div className="input-group-append">
               <button className="btn btn-default btn-outline-secondary" type="submit">
-                <span className="glyphicon glyphicon-align-left" aria-hidden="true"></span>
-                Add</button>
+                <span className="fas fa-plus" aria-hidden="true"></span>
+              </button>
             </div>
           </div>
         </div>
